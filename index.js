@@ -1,28 +1,34 @@
-const express = require("express");
-const hbs = require("hbs");
-const wax = require("wax-on");
-require("dotenv").config();
+const express = require('express');
+const hbs = require('hbs');
+const wax = require('wax-on');
+require('dotenv').config();
+const { createConnection } = require('mysql2/promise');
 
-// Create Express Server
-const app = express();
+let app = express();
+app.set('view engine', 'hbs');
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: false }));
 
-// Setting HBS framework
-app.set("view engine", "hbs");
 wax.on(hbs.handlebars);
-wax.setLayoutPath("./views/layouts");
+wax.setLayoutPath('./views/layouts');
 
+let connection;
 
-// Routes
-app.get("/", (req, res)=>{
-    res.send("default path")
-})
+async function main() {
+    connection = await createConnection({
+        'host': process.env.DB_HOST,
+        'user': process.env.DB_USER,
+        'database': process.env.DB_NAME,
+        'password': process.env.DB_PASSWORD
+    })
 
-app.get("/test", (req, res)=>{
-    res.render("test-file")
-})
+    app.get('/', (req, res) => {
+        res.send('Hello, World!');
+    });
 
+    app.listen(3000, () => {
+        console.log('Server is running')
+    });
+}
 
-// Server listening
-app.listen(3000, (req, res)=>{
-    console.log("server has started on port 3000")
-})
+main();
