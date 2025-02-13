@@ -26,6 +26,13 @@ async function main() {
         res.send('Hello, World!');
     });
 
+    app.get('/customers', async (req, res) => {
+        let [customers] = await connection.execute('SELECT * FROM Customers INNER JOIN Companies ON Customers.company_id = Companies.company_id');
+        res.render('customers/index', {
+            'customers': customers
+        })
+    })
+
     app.listen(3000, () => {
         console.log('Server is running')
     });
